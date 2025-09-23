@@ -1,0 +1,315 @@
+{
+    "id": "Mobile-Element-Detection",
+    "script": "App-Mobile-Element-Detection",
+    "label": "Mobile Element Detection (geNomad + Assembly)",
+    "description": "Executes genome assembly (if needed) followed by geNomad pipeline for plasmid and virus identification, with automated annotation of viral genomes",
+    "default_memory": "32G",
+    "parameters": [
+        {
+            "id": "input_type",
+            "label": "Input Type",
+            "required": 1,
+            "default": "contigs",
+            "desc": "Type of input data - assembled contigs or raw reads",
+            "type": "enum",
+            "enum": ["contigs", "reads"]
+        },
+        {
+            "id": "input_file",
+            "label": "Input FASTA file",
+            "required": 0,
+            "default": null,
+            "desc": "Input file of contigs in FASTA format containing sequences to analyze (required when input_type is 'contigs')",
+            "type": "wsid"
+        },
+        {
+            "id": "paired_end_libs",
+            "label": "Paired-end read libraries",
+            "required": 0,
+            "default": null,
+            "desc": "Paired-end read libraries for assembly (used when input_type is 'reads')",
+            "type": "group",
+            "allow_multiple": true,
+            "group": [
+                {
+                    "id": "read1",
+                    "required": 1,
+                    "label": "Read file 1",
+                    "desc": "FASTQ file of reads",
+                    "type": "wstype",
+                    "wstype": "ReadFile"
+                },
+                {
+                    "id": "read2",
+                    "required": 0,
+                    "label": "Read file 2",
+                    "desc": "FASTQ file of reads",
+                    "type": "wstype",
+                    "wstype": "ReadFile"
+                },
+                {
+                    "default": "infer",
+                    "desc": "Sequencing platform used to generate the read library",
+                    "enum": [
+                        "infer",
+                        "illumina",
+                        "pacbio",
+                        "pacbio_hifi",
+                        "nanopore"
+                    ],
+                    "id": "platform",
+                    "label": "Sequencing Platform",
+                    "required": 0,
+                    "type": "enum"
+                },
+                {
+                    "default": false,
+                    "id": "interleaved",
+                    "label": "Are the paired end reads interleaved?",
+                    "required": false,
+                    "type": "bool"
+                },
+                {
+                    "default": false,
+                    "id": "read_orientation_outward",
+                    "label": "Do the two reads in each pair face outward?",
+                    "required": false,
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "id": "single_end_libs",
+            "label": "Single-end read libraries",
+            "required": 0,
+            "default": null,
+            "desc": "Single-end read libraries for assembly (used when input_type is 'reads')",
+            "type": "group",
+            "allow_multiple": true,
+            "group": [
+                {
+                    "id": "read",
+                    "required": 1,
+                    "label": "Read file",
+                    "desc": "FASTQ file of reads",
+                    "type": "wstype",
+                    "wstype": "ReadFile"
+                },
+                {
+                    "default": "infer",
+                    "desc": "Sequencing platform used to generate the read library",
+                    "enum": [
+                        "infer",
+                        "illumina",
+                        "pacbio",
+                        "pacbio_hifi",
+                        "nanopore"
+                    ],
+                    "id": "platform",
+                    "label": "Sequencing Platform",
+                    "required": 0,
+                    "type": "enum"
+                }
+            ]
+        },
+        {
+            "id": "srr_ids",
+            "label": "SRA run accessions",
+            "required": 0,
+            "default": null,
+            "desc": "Sequence Read Archive (SRA) run accessions (used when input_type is 'reads')",
+            "type": "array",
+            "allow_multiple": true
+        },
+        {
+            "id": "recipe",
+            "label": "Assembly recipe",
+            "required": 0,
+            "default": "auto",
+            "desc": "Recipe used for assembly (used when input_type is 'reads')",
+            "type": "enum",
+            "enum": [
+                "auto",
+                "unicycler",
+                "flye",
+                "meta-flye",
+                "canu",
+                "spades",
+                "meta-spades",
+                "plasmid-spades",
+                "single-cell",
+                "megahit"
+            ]
+        },
+        {
+            "id": "racon_iter",
+            "label": "Racon iterations",
+            "required": 0,
+            "default": 2,
+            "desc": "Racon polishing iterations (for long reads)",
+            "type": "int"
+        },
+        {
+            "id": "pilon_iter",
+            "label": "Pilon iterations",
+            "required": 0,
+            "default": 2,
+            "desc": "Pilon polishing iterations (for short reads)",
+            "type": "int"
+        },
+        {
+            "id": "trim",
+            "label": "Trim reads",
+            "required": 0,
+            "default": false,
+            "desc": "Trim reads before assembly",
+            "type": "bool"
+        },
+        {
+            "id": "target_depth",
+            "label": "Target depth",
+            "required": 0,
+            "default": 200,
+            "desc": "Target depth for BBNorm and Filtlong",
+            "type": "int"
+        },
+        {
+            "id": "normalize",
+            "label": "Normalize reads",
+            "required": 0,
+            "default": false,
+            "desc": "Normalize reads using BBNorm before assembly",
+            "type": "bool"
+        },
+        {
+            "id": "filtlong",
+            "label": "Filter long reads",
+            "required": 0,
+            "default": false,
+            "desc": "Filter long reads on length and quality to target depth",
+            "type": "bool"
+        },
+        {
+            "id": "genome_size",
+            "label": "Genome size",
+            "required": 0,
+            "default": 5000000,
+            "desc": "Estimated genome size (used for canu and flye and filtlong)",
+            "type": "int"
+        },
+        {
+            "id": "min_contig_len",
+            "label": "Minimal output contig length",
+            "required": 0,
+            "default": 300,
+            "desc": "Filter out short contigs in final assembly",
+            "type": "int"
+        },
+        {
+            "id": "min_contig_cov",
+            "label": "Minimal output contig coverage",
+            "required": 0,
+            "default": 5,
+            "desc": "Filter out contigs with low read depth in final assembly",
+            "type": "float"
+        },
+        {
+            "id": "max_bases",
+            "label": "Maximum bases",
+            "required": 0,
+            "default": 10000000000,
+            "desc": "Maximum bases across all input read files triggering downsampling",
+            "type": "int"
+        },
+        {
+            "id": "output_path",
+            "label": "Output Folder",
+            "required": 1,
+            "default": null,
+            "desc": "Path to which the output will be written",
+            "type": "folder"
+        },
+        {
+            "id": "output_file",
+            "label": "Output File Name",
+            "required": 1,
+            "default": null,
+            "desc": "File to which the output will be written",
+            "type": "wsid"
+        },
+        {
+            "id": "filtering-preset",
+            "label": "Filtering preset",
+            "required": 0,
+            "default": null,
+            "desc": "Conservative preset makes filters more aggressive for high-confidence results, relaxed preset disables post-classification filters",
+            "type": "enum",
+            "enum": ["conservative", "relaxed"]
+        },
+        {
+            "id": "cleanup",
+            "label": "Cleanup intermediate files",
+            "required": 0,
+            "default": true,
+            "desc": "Delete intermediate files after execution",
+            "type": "bool"
+        },
+        {
+            "id": "restart",
+            "label": "Restart analysis",
+            "required": 0,
+            "default": true,
+            "desc": "Overwrite existing intermediate files",
+            "type": "bool"
+        },
+        {
+            "id": "verbose",
+            "label": "Verbose output",
+            "required": 0,
+            "default": true,
+            "desc": "Display the execution log",
+            "type": "bool"
+        },
+        {
+            "id": "lenient-taxonomy",
+            "label": "Lenient taxonomy",
+            "required": 0,
+            "default": false,
+            "desc": "Allow classification of virus genomes to taxa below the family rank",
+            "type": "bool"
+        },
+        {
+            "id": "full-ictv-lineage",
+            "label": "Full ICTV lineage",
+            "required": 0,
+            "default": true,
+            "desc": "Output the full ICTV lineage of each virus genome",
+            "type": "bool"
+        },
+        {
+            "id": "composition",
+            "label": "Sample composition",
+            "required": 0,
+            "default": "auto",
+            "desc": "Method for estimating sample composition",
+            "type": "enum",
+            "enum": ["auto", "metagenome", "virome"]
+        },
+        {
+            "id": "force-auto",
+            "label": "Force automatic composition",
+            "required": 0,
+            "default": false,
+            "desc": "Force automatic composition estimation regardless of sample size",
+            "type": "bool"
+        },
+        {
+            "id": "debug",
+            "label": "Debug level",
+            "required": 0,
+            "default": 0,
+            "desc": "Debugging level for assembly",
+            "type": "int"
+        }
+    ]
+}
