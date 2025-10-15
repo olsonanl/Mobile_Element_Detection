@@ -12,9 +12,6 @@ use warnings;
 use Carp::Always;
 use Bio::KBase::AppService::AppScript;
 
-# Add lib directory to the module search path
-use lib 'lib';
-
 # Import the functions we need from our module
 use MobileElementDetection qw(run preflight);
 
