@@ -1,0 +1,6 @@
+{
+    "input_type": "contigs",
+    "input_file": "/olson@patricbrc.org/PATRIC-QA/applications/App-MobileElementDetection/Viral-Plasmid-Test.fasta",
+    "output_path": "/olson@patricbrc.org/home/test",
+    "output_file": "viral-plasmid.out"
+}
