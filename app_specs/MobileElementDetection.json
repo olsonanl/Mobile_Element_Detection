@@ -1,6 +1,6 @@
 {
-    "id": "Mobile-Element-Detection",
-    "script": "App-Mobile-Element-Detection",
+    "id": "MobileElementDetection",
+    "script": "App-MobileElementDetection",
     "label": "Mobile Element Detection (geNomad + Assembly)",
     "description": "Executes genome assembly (if needed) followed by geNomad pipeline for plasmid and virus identification, with automated annotation of viral genomes",
     "default_memory": "32G",
